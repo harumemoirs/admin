@@ -1,0 +1,405 @@
+/* eslint-disable react/no-unescaped-entities */
+"use client";
+import { useState, useEffect } from "react";
+import { Button } from "@/src/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
+import { Badge } from "@/src/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/src/components/ui/alert-dialog";
+import { Eye, Edit3, Trash2, ChevronLeft, ChevronRight, Calendar, Loader2, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { getAllBlogs } from "@/src/functions/services/blog/get-service";
+
+interface Blog {
+  _id?: string;
+  id?: string;
+  title: string;
+  content: string;
+  synopsis?: string;
+  image?: string;
+  imageUrls?: string[];
+  slug: string;
+  createdAt?: string;
+  updatedAt?: string;
+  author?: string;
+  status?: string;
+  views?: number;
+}
+
+interface BlogsResponse {
+  success: boolean;
+  data: Blog[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
+}
+
+export default function AllBlogsPage() {
+  const router = useRouter();
+  const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [totalBlogs, setTotalBlogs] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [blogToDelete, setBlogToDelete] = useState<Blog | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const BLOGS_PER_PAGE = 9;
+  
+  // Default fallback image
+  const DEFAULT_IMAGE = "https://res.cloudinary.com/dwtbvdlzg/image/upload/v1765380884/hero-1st-left_bc863k.jpg";
+
+  useEffect(() => {
+    fetchBlogs(currentPage);
+  }, [currentPage]);
+
+  const fetchBlogs = async (page: number) => {
+    setIsLoading(true);
+    try {
+      const response: BlogsResponse = await getAllBlogs(page, BLOGS_PER_PAGE);
+      
+      console.log("Fetched blogs:", response.data);
+      
+      setBlogs(response.data || []);
+      setTotalPages(response.pagination.totalPages || 1);
+      setTotalBlogs(response.pagination.total || 0);
+      setCurrentPage(response.pagination.page || page);
+    } catch (error) {
+      console.error("Fetch blogs error:", error);
+      setBlogs([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDelete = (blog: Blog) => {
+    setBlogToDelete(blog);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteBlog = async () => {
+    if (!blogToDelete) return;
+
+    const blogId = blogToDelete._id || blogToDelete.id;
+    if (!blogId) return;
+
+    try {
+      setDeleting(true);
+      // Replace with your actual delete API call
+      // await deleteBlog(blogId);
+      
+      setBlogs(blogs.filter((blog) => (blog._id || blog.id) !== blogId));
+      setDeleteDialogOpen(false);
+      setBlogToDelete(null);
+      
+      // Refresh the blogs list
+      fetchBlogs(currentPage);
+    } catch (error) {
+      console.error("Error deleting blog:", error);
+      alert("Failed to delete blog");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleView = (id: string) => {
+    router.push(`/dashboard/blogs/blog/${id}`);
+  };
+
+  const handleEdit = (id: string) => {
+    router.push(`/dashboard/blogs/edit/${id}`);
+  };
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  const truncateText = (text: string, maxLength: number): string => {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + "...";
+  };
+
+  // Get image URL with fallback
+  const getImageUrl = (blog: Blog): string => {
+    return blog.imageUrls?.[0] || blog.image || DEFAULT_IMAGE;
+  };
+
+  if (isLoading) {
+    return (
+      <div className="w-full min-h-screen px-4 sm:px-6 py-6 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-gray-600" />
+            <span className="ml-2 text-gray-600">Loading blogs...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full h-screen flex flex-col bg-gray-50">
+      {/* Fixed Header */}
+      <div className="flex-shrink-0 bg-white border-b px-12 sm:px-20 py-6">
+        <div className="max-w-7xl mx-auto">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">All Blogs</h1>
+            <p className="text-gray-600">
+              Showing {blogs.length} of {totalBlogs} {totalBlogs === 1 ? "blog" : "blogs"}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-7xl mx-auto px-12 sm:px-20 py-6">
+          {blogs.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-gray-400 mb-4">
+                <svg
+                  className="mx-auto h-12 w-12"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No blogs found</h3>
+              <p className="text-gray-600 mb-4">Get started by creating a new blog post.</p>
+              <Button onClick={() => router.push("/dashboard/blogs/add-blog")}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add New Blog
+              </Button>
+            </div>
+          ) : (
+            <>
+              {/* Blogs Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                {blogs.map((blog) => {
+                  const blogId = blog._id || blog.id || "";
+                  const imageUrl = getImageUrl(blog);
+                  
+                  return (
+                    <Card
+                      key={blogId}
+                      className="hover:shadow-md transition-shadow duration-200 overflow-hidden"
+                    >
+                      {/* Blog Image */}
+                      <div className="relative h-48 overflow-hidden bg-gray-100">
+                        <img
+                          src={imageUrl}
+                          alt={blog.title || "Blog post"}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            console.error(`Failed to load image for blog: ${blog.title}`, imageUrl);
+                            e.currentTarget.src = DEFAULT_IMAGE;
+                          }}
+                          loading="lazy"
+                        />
+                        {blog.status && (
+                          <div className="absolute top-2 left-2">
+                            <Badge
+                              variant={blog.status === "published" ? "default" : "secondary"}
+                              className="text-xs"
+                            >
+                              {blog.status}
+                            </Badge>
+                          </div>
+                        )}
+                        {blog.views !== undefined && (
+                          <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 flex items-center text-xs text-gray-700">
+                            <Eye className="h-3 w-3 mr-1" />
+                            {blog.views}
+                          </div>
+                        )}
+                      </div>
+
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-lg leading-tight line-clamp-2">
+                          {blog.title}
+                        </CardTitle>
+                      </CardHeader>
+
+                      <CardContent className="pt-0">
+                        <div className="space-y-3">
+                          {/* Author and Date */}
+                          <div className="flex items-center justify-between text-sm text-gray-600">
+                            {blog.author && (
+                              <div className="flex items-center">
+                                <span className="text-xs">{blog.author}</span>
+                              </div>
+                            )}
+                            <div className="flex items-center">
+                              <Calendar className="h-3 w-3 mr-1" />
+                              {new Date(blog.createdAt || Date.now()).toLocaleDateString()}
+                            </div>
+                          </div>
+
+                          {/* Synopsis/Content Preview */}
+                          <p className="text-sm text-gray-700 line-clamp-3">
+                            {blog.synopsis || truncateText(blog.content, 120)}
+                          </p>
+
+                          {/* Action Buttons */}
+                          <div className="flex gap-2 pt-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleView(blogId)}
+                              className="flex-1"
+                            >
+                              <Eye className="h-3 w-3 mr-1" />
+                              View
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={() => handleEdit(blogId)}
+                              className="flex-1"
+                            >
+                              <Edit3 className="h-3 w-3 mr-1" />
+                              Edit
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleDelete(blog)}
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2 pb-6">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="flex items-center gap-1"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    Previous
+                  </Button>
+
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                      if (
+                        page === 1 ||
+                        page === totalPages ||
+                        (page >= currentPage - 1 && page <= currentPage + 1)
+                      ) {
+                        return (
+                          <Button
+                            key={page}
+                            variant={currentPage === page ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => handlePageChange(page)}
+                            className={
+                              currentPage === page
+                                ? "bg-black text-white"
+                                : "bg-white"
+                            }
+                          >
+                            {page}
+                          </Button>
+                        );
+                      } else if (
+                        page === currentPage - 2 ||
+                        page === currentPage + 2
+                      ) {
+                        return (
+                          <span key={page} className="px-2 text-gray-500">
+                            ...
+                          </span>
+                        );
+                      }
+                      return null;
+                    })}
+                  </div>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="flex items-center gap-1"
+                  >
+                    Next
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
+
+              {/* Page Info */}
+              <div className="text-center text-sm text-gray-600 pb-6">
+                Page {currentPage} of {totalPages}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Blog</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{blogToDelete?.title}"? This
+              action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteBlog}
+              disabled={deleting}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {deleting ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}

@@ -17,6 +17,7 @@ import {
 import { Eye, Edit3, Trash2, ChevronLeft, ChevronRight, Calendar, Loader2, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getAllBlogs } from "@/src/functions/services/blog/get-service";
+import { removeBlog } from "@/src/functions/services/blog/post-service";
 
 interface Blog {
   _id?: string;
@@ -99,8 +100,7 @@ export default function AllBlogsPage() {
 
     try {
       setDeleting(true);
-      // Replace with your actual delete API call
-      // await deleteBlog(blogId);
+    await removeBlog({blogId});
       
       setBlogs(blogs.filter((blog) => (blog._id || blog.id) !== blogId));
       setDeleteDialogOpen(false);

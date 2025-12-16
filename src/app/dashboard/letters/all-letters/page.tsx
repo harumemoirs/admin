@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/src/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
+import { Badge } from "@/src/components/ui/badge";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,19 +14,24 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/src/components/ui/alert-dialog";
-import { Eye, Edit3, Trash2, ChevronLeft, ChevronRight, Calendar, Loader2, Plus, Mail } from "lucide-react";
+import { Eye, Edit3, Trash2, ChevronLeft, ChevronRight, Calendar, Loader2, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getAllLetters } from "@/src/functions/services/letter/get-service";
-
+import { removeLetter } from "@/src/functions/services/letter/post-service";
 interface Letter {
   _id?: string;
   id?: string;
   title: string;
   content: string;
+  date: string;
+  image?: string;
+  imageUrls?: string[];
   slug: string;
-  date?: string;
   createdAt?: string;
   updatedAt?: string;
+  author?: string;
+  status?: string;
+  views?: number;
 }
 
 interface LettersResponse {
@@ -53,6 +59,9 @@ export default function AllLettersPage() {
   const [deleting, setDeleting] = useState(false);
 
   const LETTERS_PER_PAGE = 9;
+  
+  // Default fallback image
+  const DEFAULT_IMAGE = "https://res.cloudinary.com/dwtbvdlzg/image/upload/v1765380884/hero-1st-left_bc863k.jpg";
 
   useEffect(() => {
     fetchLetters(currentPage);
@@ -90,8 +99,7 @@ export default function AllLettersPage() {
 
     try {
       setDeleting(true);
-      // Replace with your actual delete API call
-      // await deleteLetter(letterId);
+      await removeLetter({ letterId });
       
       setLetters(letters.filter((letter) => (letter._id || letter.id) !== letterId));
       setDeleteDialogOpen(false);
@@ -112,7 +120,7 @@ export default function AllLettersPage() {
   };
 
   const handleEdit = (id: string) => {
-    router.push(`/dashboard/letters/edit/${id}`);
+    router.push(`/dashboard/letters/edit-letter/${id}`);
   };
 
   const handlePageChange = (newPage: number) => {
@@ -125,6 +133,11 @@ export default function AllLettersPage() {
   const truncateText = (text: string, maxLength: number): string => {
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + "...";
+  };
+
+  // Get image URL with fallback
+  const getImageUrl = (letter: Letter): string => {
+    return letter.imageUrls?.[0] || letter.image || DEFAULT_IMAGE;
   };
 
   if (isLoading) {
@@ -187,15 +200,41 @@ export default function AllLettersPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                 {letters.map((letter) => {
                   const letterId = letter._id || letter.id || "";
+                  const imageUrl = getImageUrl(letter);
                   
                   return (
                     <Card
                       key={letterId}
                       className="hover:shadow-md transition-shadow duration-200 overflow-hidden"
                     >
-                      {/* Letter Icon Header */}
-                      <div className="relative h-32 bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-                        <Mail className="h-16 w-16 text-indigo-400" />
+                      {/* Letter Image */}
+                      <div className="relative h-48 overflow-hidden bg-gray-100">
+                        <img
+                          src={imageUrl}
+                          alt={letter.title || "Letter"}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            console.error(`Failed to load image for letter: ${letter.title}`, imageUrl);
+                            e.currentTarget.src = DEFAULT_IMAGE;
+                          }}
+                          loading="lazy"
+                        />
+                        {letter.status && (
+                          <div className="absolute top-2 left-2">
+                            <Badge
+                              variant={letter.status === "published" ? "default" : "secondary"}
+                              className="text-xs"
+                            >
+                              {letter.status}
+                            </Badge>
+                          </div>
+                        )}
+                        {letter.views !== undefined && (
+                          <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 flex items-center text-xs text-gray-700">
+                            <Eye className="h-3 w-3 mr-1" />
+                            {letter.views}
+                          </div>
+                        )}
                       </div>
 
                       <CardHeader className="pb-3">
@@ -206,15 +245,22 @@ export default function AllLettersPage() {
 
                       <CardContent className="pt-0">
                         <div className="space-y-3">
-                          {/* Date */}
-                          <div className="flex items-center text-sm text-gray-600">
-                            <Calendar className="h-3 w-3 mr-1" />
-                            {new Date(letter.date || letter.createdAt || Date.now()).toLocaleDateString()}
+                          {/* Author and Date */}
+                          <div className="flex items-center justify-between text-sm text-gray-600">
+                            {letter.author && (
+                              <div className="flex items-center">
+                                <span className="text-xs">{letter.author}</span>
+                              </div>
+                            )}
+                            <div className="flex items-center">
+                              <Calendar className="h-3 w-3 mr-1" />
+                              {letter.date}
+                            </div>
                           </div>
 
                           {/* Content Preview */}
-                          <p className="text-sm text-gray-700 line-clamp-4">
-                            {truncateText(letter.content, 150)}
+                          <p className="text-sm text-gray-700 line-clamp-3">
+                            {truncateText(letter.content, 120)}
                           </p>
 
                           {/* Action Buttons */}

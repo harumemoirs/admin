@@ -17,6 +17,7 @@ import {
 import { Eye, Edit3, Trash2, ChevronLeft, ChevronRight, Calendar, Loader2, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getAllJournals } from "@/src/functions/services/journal/get-service";
+import { removeJournal } from "@/src/functions/services/journal/post-service";
 
 interface Journal {
   _id?: string;
@@ -99,8 +100,7 @@ export default function AllJournalsPage() {
 
     try {
       setDeleting(true);
-      // Replace with your actual delete API call
-      // await deleteJournal(journalId);
+      await removeJournal({journalId})
       
       setJournals(journals.filter((journal) => (journal._id || journal.id) !== journalId));
       setDeleteDialogOpen(false);

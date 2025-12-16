@@ -7,16 +7,18 @@ interface AddLetterData{
     date:string
     slug:string,
     content:string
+   
 }
 interface EditLetterData{
     title?:string,
     content?:string,
     slug?:string,
-    date?:string
+    date?:string,
+    
 }
  
 
-export const addLetter = async (data: AddLetterData) => {
+export const addLetter = async (data: AddLetterData,image:File) => {
   try {
     const form = new FormData();
 
@@ -24,10 +26,10 @@ export const addLetter = async (data: AddLetterData) => {
     form.append("date", data.date);
     form.append("slug", data.slug);
     form.append("content", data.content);
-  
+    form.append("image",image)
 
     const res = await axiosLetter.post("/add-letter", form, {
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "multipart/form-data" },
       withCredentials:true
     });
 
@@ -58,20 +60,30 @@ export const addLetter = async (data: AddLetterData) => {
 export const editLetter = async (
   letterId: string,
   data: EditLetterData,
+  image?: File,
+  replaceImages = false
 ) => {
   try {
     const form = new FormData();
 
-    Object.entries(data).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        form.append(key, value as string);
-      }
-    });
- 
+    if (data.title) form.append("title", data.title);
+    if (data.content) form.append("content", data.content);
+    if (data.slug) form.append("slug", data.slug);
+    if (data.date) form.append("synopsis", data.date);
 
-    const res = await axiosLetter.put(`/edit-letter/${letterId}`, form, {
-      headers: { "Content-Type": "application/json" },
-    });
+    if (image) {
+      form.append("image", image);
+      form.append("replaceImages", replaceImages ? "true" : "false");
+    }
+
+    const res = await axiosLetter.put(
+      `/edit-letter/${letterId}`,
+      form,
+      {
+        withCredentials: true, // IMPORTANT
+        // ❌ NO Content-Type
+      }
+    );
 
     if (res.status === 200) {
       return {
@@ -86,9 +98,7 @@ export const editLetter = async (
       message: `Unexpected status code: ${res.status}`,
     };
   } catch (err: any) {
-   
     const msg = err?.response?.data?.message;
-
     return {
       success: false,
       message: msg || "Something went wrong",
@@ -96,8 +106,9 @@ export const editLetter = async (
   }
 };
 
+
 interface RemoveLetterData {
-    letter:string
+    letterId:string
 }
 export const removeLetter = async (data:RemoveLetterData) => {
   try {
@@ -164,3 +175,36 @@ export const removeLetter = async (data:RemoveLetterData) => {
     };
   }
 };
+
+export async function getLetterForEdit(letterId: string) {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/kairos/letters/letter-id/${letterId}`, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        message: errorData.message || "Failed to fetch letter",
+        letter: null,
+      };
+    }
+
+    const result = await response.json();
+   
+    return {
+      success: result.success,
+      letter: result.data, // Map 'data' to 'blog'
+      message: result.message,
+    };
+  } catch (error) {
+    console.error("Get letter error:", error);
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Network error",
+      blog: null,
+    };
+  }
+}

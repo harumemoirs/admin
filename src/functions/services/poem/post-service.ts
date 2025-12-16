@@ -103,7 +103,7 @@ export async function editPoem(
   }
 }
 
-interface RemovePoemData {
+export interface RemovePoemData {
     poemId:string
 }
 export const removePoem = async (data:RemovePoemData) => {
@@ -193,7 +193,7 @@ export async function getPoemForEdit(poemId: string) {
      
     return {
       success: result.success,
-      blog: result.data, // Map 'data' to 'blog'
+      poem: result.data, // Map 'data' to 'blog'
       message: result.message,
     };
   } catch (error) {

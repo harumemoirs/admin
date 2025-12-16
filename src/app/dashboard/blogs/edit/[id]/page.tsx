@@ -33,7 +33,6 @@ export default function EditBlogPage() {
   const [slug, setSlug] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isSlugLocked, setIsSlugLocked] = useState(false);
 
   useEffect(() => {
     if (!blogId) return;
@@ -48,7 +47,6 @@ export default function EditBlogPage() {
           setContent(result.blog.content ?? "");
           setSynopsis(result.blog.synopsis ?? "");
           setSlug(result.blog.slug ?? "");
-          setIsSlugLocked(true);
 
           const img =
             result.blog.imageUrls?.[0] || result.blog.image_urls?.[0] || "";
@@ -69,8 +67,6 @@ export default function EditBlogPage() {
   }, [blogId, router]);
 
   useEffect(() => {
-    if (isSlugLocked) return;
-
     setSlug(
       title
         .toLowerCase()
@@ -78,7 +74,7 @@ export default function EditBlogPage() {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-+|-+$/g, "")
     );
-  }, [title, isSlugLocked]);
+  }, [title]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -187,7 +183,7 @@ export default function EditBlogPage() {
         });
 
         setTimeout(() => {
-          router.push("/dashboard/blogs");
+          router.push(`/dashboard/blogs/blog/${blogId}`);
         }, 500);
       } else {
         toast.error("Failed to Update Blog", {
@@ -292,7 +288,6 @@ export default function EditBlogPage() {
                     placeholder="url-slug"
                     className="mt-1 bg-gray-50"
                     value={slug}
-                    disabled
                     readOnly
                   />
                   <p className="text-xs text-gray-500 mt-1">

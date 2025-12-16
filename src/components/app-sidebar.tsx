@@ -30,14 +30,16 @@ import {
 } from "@/src/components/ui/collapsible";
 import Image from "next/image";
 import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/src/components/ui/hover-card";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/src/components/ui/dropdown-menu";
 import { Button } from "@/src/components/ui/button";
 
 import { useAdmin } from "../hooks/use-admin";
 import axios from "axios";
+
 const sidebarNav = [
   {
     title: "Blogs",
@@ -105,9 +107,6 @@ export default function AppSidebar({
   const pathname = usePathname();
   const router = useRouter();
   const { admin, loading } = useAdmin();
-  const [userEmail, setUserEmail] = React.useState<string | null>(null);
-  const [userRole, setUserRole] = React.useState<string | null>(null);
-  const [userName, setUserName] = React.useState<string | null>(null);
 
   const handleLogout = async () => {
     await axios.post(
@@ -215,16 +214,16 @@ export default function AppSidebar({
         ))}
       </SidebarContent>
 
-      {/* --- User Info with HoverCard --- */}
+      {/* --- User Info with DropdownMenu (Mobile-Friendly) --- */}
       <div className="p-4 border-t">
-        <HoverCard openDelay={100}>
-          <HoverCardTrigger asChild>
-            <div className="flex items-center gap-3 cursor-pointer rounded-lg p-2 hover:bg-gray-100">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="flex items-center gap-3 w-full rounded-lg p-2 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white">
                 <User size={20} className="text-gray-600" />
               </div>
 
-              <div className="flex flex-col">
+              <div className="flex flex-col text-left flex-1">
                 <span className="text-sm font-medium text-gray-900">
                   {loading ? "Loading..." : admin?.name}
                 </span>
@@ -233,20 +232,19 @@ export default function AppSidebar({
                   {admin?.email || "No email"}
                 </span>
               </div>
-            </div>
-          </HoverCardTrigger>
+            </button>
+          </DropdownMenuTrigger>
 
-          <HoverCardContent side="top" align="end" className="p-2 w-40">
-            <Button
+          <DropdownMenuContent side="top" align="end" className="w-48">
+            <DropdownMenuItem
               onClick={handleLogout}
-              variant="ghost"
-              className="w-full flex items-center justify-start gap-2 text-red-600 hover:bg-red-100"
+              className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer"
             >
-              <LogOut size={16} />
+              <LogOut size={16} className="mr-2" />
               Log out
-            </Button>
-          </HoverCardContent>
-        </HoverCard>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <SidebarRail />

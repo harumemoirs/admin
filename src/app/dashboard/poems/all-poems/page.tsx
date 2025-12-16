@@ -17,6 +17,7 @@ import {
 import { Eye, Edit3, Trash2, ChevronLeft, ChevronRight, Calendar, Loader2, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getAllPoems } from "@/src/functions/services/poem/get-service";
+import { removePoem, RemovePoemData } from "@/src/functions/services/poem/post-service";
 
 interface Poem {
   _id?: string;
@@ -60,7 +61,7 @@ export default function AllPoemsPage() {
 
   const POEMS_PER_PAGE = 9;
   
-  // Default fallback image
+ 
   const DEFAULT_IMAGE = "https://res.cloudinary.com/dwtbvdlzg/image/upload/v1765380884/hero-1st-left_bc863k.jpg";
 
   useEffect(() => {
@@ -93,14 +94,14 @@ export default function AllPoemsPage() {
 
   const confirmDeletePoem = async () => {
     if (!poemToDelete) return;
-
+   
     const poemId = poemToDelete._id || poemToDelete.id;
     if (!poemId) return;
-
+    console.log(poemId)
     try {
       setDeleting(true);
       // Replace with your actual delete API call
-      // await deletePoem(poemId);
+      await removePoem({poemId}) ;
       
       setPoems(poems.filter((poem) => (poem._id || poem.id) !== poemId));
       setDeleteDialogOpen(false);
@@ -121,7 +122,7 @@ export default function AllPoemsPage() {
   };
 
   const handleEdit = (id: string) => {
-    router.push(`/dashboard/poems/edit/${id}`);
+    router.push(`/dashboard/poems/edit-poem/${id}`);
   };
 
   const handlePageChange = (newPage: number) => {
@@ -143,7 +144,7 @@ export default function AllPoemsPage() {
 
   if (isLoading) {
     return (
-      <div className="w-full min-h-screen px-4 sm:px-6 py-6 bg-gray-50">
+      <div className="w-full min-h-screen px-4 sm:px-6 py-6 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-gray-600" />

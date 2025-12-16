@@ -17,7 +17,8 @@ import {
   ArrowLeft,
 } from "lucide-react";
  
-import { editJournal,getJournalForEdit } from "@/src/functions/services/journal/post-service";
+import { editJournal, getJournalForEdit } from "@/src/functions/services/journal/post-service";
+
 export default function EditJournalPage() {
   const params = useParams();
   const router = useRouter();
@@ -32,7 +33,6 @@ export default function EditJournalPage() {
   const [slug, setSlug] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isSlugLocked, setIsSlugLocked] = useState(false);
 
   useEffect(() => {
     if (!journalId) return;
@@ -47,7 +47,6 @@ export default function EditJournalPage() {
           setContent(result.journal.content ?? "");
           setSynopsis(result.journal.synopsis ?? "");
           setSlug(result.journal.slug ?? "");
-          setIsSlugLocked(true);
 
           const img =
             result.journal.imageUrls?.[0] || result.journal.image_urls?.[0] || "";
@@ -68,8 +67,6 @@ export default function EditJournalPage() {
   }, [journalId, router]);
 
   useEffect(() => {
-    if (isSlugLocked) return;
-
     setSlug(
       title
         .toLowerCase()
@@ -77,7 +74,7 @@ export default function EditJournalPage() {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-+|-+$/g, "")
     );
-  }, [title, isSlugLocked]);
+  }, [title]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -186,10 +183,10 @@ export default function EditJournalPage() {
         });
 
         setTimeout(() => {
-          router.push("/dashboard/journals");
+          router.push(`/dashboard/journals/journal/${journalId}`);
         }, 500);
       } else {
-        toast.error("Failed to Update journal", {
+        toast.error("Failed to Update Journal", {
           description: result.message || "Something went wrong",
           duration: 4000,
         });
@@ -231,14 +228,14 @@ export default function EditJournalPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => router.push("/dashboard/journals")}
+              onClick={() => router.push("/admin/journals")}
               disabled={isSubmitting}
               className="flex items-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
               Back
             </Button>
-            <h1 className="text-3xl font-bold text-gray-900">Edit Journals</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Edit Journal</h1>
           </div>
 
           <Button
@@ -291,7 +288,6 @@ export default function EditJournalPage() {
                     placeholder="url-slug"
                     className="mt-1 bg-gray-50"
                     value={slug}
-                    disabled
                     readOnly
                   />
                   <p className="text-xs text-gray-500 mt-1">
@@ -325,13 +321,13 @@ export default function EditJournalPage() {
                 Featured Image
               </h3>
 
-              <Label htmlFor="blogImage" className="flex items-center gap-2">
+              <Label htmlFor="journalImage" className="flex items-center gap-2">
                 <Image className="text-gray-500 w-4 h-4" />
                 Upload New Image (Optional)
               </Label>
 
               <Input
-                id="blogImage"
+                id="journalImage"
                 type="file"
                 accept="image/*"
                 className="mt-1"
@@ -387,17 +383,17 @@ export default function EditJournalPage() {
             <div className="bg-white rounded-lg shadow-sm border h-full flex flex-col">
               <div className="p-6 border-b">
                 <Label
-                  htmlFor="blogContent"
+                  htmlFor="journalContent"
                   className="text-lg font-semibold flex items-center gap-2"
                 >
                   <FileText className="text-gray-600 w-5 h-5" />
-                  Blog Content <span className="text-red-500">*</span>
+                  Journal Content <span className="text-red-500">*</span>
                 </Label>
               </div>
 
               <div className="flex-1 p-6">
                 <Textarea
-                  id="blogContent"
+                  id="journalContent"
                   className="h-[600px] resize-none text-sm border-0 focus:ring-0 shadow-none"
                   placeholder="Start writing here..."
                   value={content}
@@ -427,7 +423,7 @@ export default function EditJournalPage() {
                   ) : (
                     <>
                       <Save className="w-4 h-4" />
-                      Update Blog
+                      Update Journal
                     </>
                   )}
                 </Button>

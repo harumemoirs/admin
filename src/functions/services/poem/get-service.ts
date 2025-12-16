@@ -24,7 +24,7 @@ export const getPoemBySlug = async (slug: string) => {
   }
 };
 
-export const getJournalById = async (id:string) => {
+export const getPoemById = async (id:string) => {
   try {
     const res = await axiosPoem.get(`/poem-id/${id}`)
     return res.data

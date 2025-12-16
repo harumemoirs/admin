@@ -52,7 +52,7 @@ export const addBlog = async (data: AddBlogData, image: File) => {
   }
 };
 
-// src/functions/services/blog/post-service.ts
+ 
 
 export async function editBlog(
   blogId: string,
@@ -67,13 +67,13 @@ export async function editBlog(
   try {
     const formData = new FormData();
     
-    // Append text fields
+ 
     formData.append("title", data.title);
     formData.append("content", data.content);
     formData.append("synopsis", data.synopsis);
     formData.append("slug", data.slug);
     
-    // If new image is provided, append it and mark for replacement
+  
     if (image) {
       formData.append("image", image);
       formData.append("replaceImages", "true");
@@ -82,7 +82,7 @@ export async function editBlog(
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/kairos/blogs/edit-blog/${blogId}`, {
       method: "PUT",
       body: formData,
-      credentials: "include", // Important for sending cookies/auth
+      credentials: "include",  
     });
 
     if (!response.ok) {

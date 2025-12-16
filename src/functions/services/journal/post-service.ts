@@ -6,12 +6,6 @@ interface AddJournalData{
     slug:string,
     content:string
 }
-interface EditJournalData{
-    title?:string,
-    synopsis?:string,
-    slug?:string,
-    content?:string
-}
  
 
 export const addJournal = async (data: AddJournalData, image: File) => {
@@ -51,49 +45,57 @@ export const addJournal = async (data: AddJournalData, image: File) => {
   }
 };
 
-export const editJournal = async (
+export async function editJournal(
   journalId: string,
-  data:EditJournalData,
+  data: {
+    title: string;
+    content: string;
+    synopsis: string;
+    slug: string;
+  },
   image?: File
-) => {
+) {
   try {
-    const form = new FormData();
+    const formData = new FormData();
 
-    Object.entries(data).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        form.append(key, value as string);
-      }
-    });
+    formData.append("title", data.title);
+    formData.append("content", data.content);
+    formData.append("synopsis", data.synopsis);
+    formData.append("slug", data.slug);
 
     if (image) {
-      form.append("image", image);
+      formData.append("image", image);
+      formData.append("replaceImages", "true");
     }
 
-    const res = await axiosJournals.put(`/edit-journals/${journalId}`, form, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/kairos/journals/edit-journal/${journalId}`,
+      {
+        method: "PUT",
+        body: formData,
+        credentials: "include",
+      }
+    );
 
-    if (res.status === 200) {
+    if (!response.ok) {
+      const errorData = await response.json();
       return {
-        success: true,
-        message: "Journal updated successfully",
-        journal: res.data,
+        success: false,
+        message: errorData.message || "Failed to update journal",
       };
     }
 
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Edit journal error:", error);
     return {
       success: false,
-      message: `Unexpected status code: ${res.status}`,
-    };
-  } catch (err: any) {
-     const msg = err?.response?.data?.message;
-
-    return {
-      success: false,
-      message: msg || "Something went wrong",
+      message: error instanceof Error ? error.message : "Network error",
     };
   }
-};
+}
+
 
 interface RemoveJournalData {
     journalId:string
@@ -163,3 +165,38 @@ export const removeJournal = async (data:RemoveJournalData) => {
     };
   }
 };
+export async function getJournalForEdit(journalId: string) {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/kairos/journals/journal-id/${journalId}`, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        message: errorData.message || "Failed to fetch journal",
+        journal: null,
+      };
+    }
+
+    const result = await response.json();
+    
+    // Backend returns { success: true, data: {...} }
+    // But frontend expects { success: true, blog: {...} }
+    // So we normalize it here
+    return {
+      success: result.success,
+      journal: result.data, // Map 'data' to 'blog'
+      message: result.message,
+    };
+  } catch (error) {
+    console.error("Get journal error:", error);
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Network error",
+      journal: null,
+    };
+  }
+}

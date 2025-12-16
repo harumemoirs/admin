@@ -52,50 +52,56 @@ export const addPoem = async (data: AddPoemData, image: File) => {
   }
 };
 
-export const editPoem = async (
+export async function editPoem(
   poemId: string,
-  data: EditPoemData,
+  data: {
+    title: string;
+    content: string;
+    synopsis: string;
+    slug: string;
+  },
   image?: File
-) => {
+) {
   try {
-    const form = new FormData();
+    const formData = new FormData();
 
-    Object.entries(data).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        form.append(key, value as string);
-      }
-    });
+    formData.append("title", data.title);
+    formData.append("content", data.content);
+    formData.append("synopsis", data.synopsis);
+    formData.append("slug", data.slug);
 
     if (image) {
-      form.append("image", image);
+      formData.append("image", image);
+      formData.append("replaceImages", "true");
     }
 
-    const res = await axiosPoem.put(`/edit-poem/${poemId}`, form, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/kairos/poems/edit-poem/${poemId}`,
+      {
+        method: "PUT",
+        body: formData,
+        credentials: "include",
+      }
+    );
 
-    if (res.status === 200) {
+    if (!response.ok) {
+      const errorData = await response.json();
       return {
-        success: true,
-        message: "Poem updated successfully",
-        poem: res.data,
+        success: false,
+        message: errorData.message || "Failed to update poem",
       };
     }
 
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Edit poem error:", error);
     return {
       success: false,
-      message: `Unexpected status code: ${res.status}`,
-    };
-  } catch (err: any) {
-     
-    const msg = err?.response?.data?.message;
-
-    return {
-      success: false,
-      message: msg || "Something went wrong",
+      message: error instanceof Error ? error.message : "Network error",
     };
   }
-};
+}
 
 interface RemovePoemData {
     poemId:string
@@ -165,3 +171,37 @@ export const removePoem = async (data:RemovePoemData) => {
     };
   }
 };
+
+
+export async function getPoemForEdit(poemId: string) {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/kairos/poems/poem-id/${poemId}`, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        message: errorData.message || "Failed to fetch poem",
+        blog: null,
+      };
+    }
+
+    const result = await response.json();
+     
+    return {
+      success: result.success,
+      blog: result.data, // Map 'data' to 'blog'
+      message: result.message,
+    };
+  } catch (error) {
+    console.error("Get poem error:", error);
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Network error",
+      blog: null,
+    };
+  }
+}

@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  ReactNode,
-} from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { createContext, useContext, useEffect, useState } from "react";
 
 type Admin = {
   id: string;
@@ -29,47 +22,31 @@ const AuthContext = createContext<AuthContextType>({
   logout: async () => {},
 });
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<Admin | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const router = useRouter();
-  const pathname = usePathname();
-
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-  // Fetch /me from backend
   const refreshUser = async () => {
     try {
       const res = await fetch(
         `${API_URL}/api/kairos/v1/admin/auth/me`,
-        {
-          credentials: "include",
-        }
+        { credentials: "include" }
       );
 
       if (!res.ok) {
         setUser(null);
-
-        if (pathname !== "/auth/login") {
-          router.push("/auth/login");
-        }
-
         return;
       }
 
       const data = await res.json();
       setUser(data);
-    } catch (err) {
+    } catch {
       setUser(null);
-
-      if (pathname !== "/auth/login") {
-        router.push("/auth/login");
-      }
     }
   };
 
-  // Run on first load
   useEffect(() => {
     (async () => {
       await refreshUser();
@@ -82,9 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       method: "POST",
       credentials: "include",
     });
-
     setUser(null);
-    router.push("/auth/login");
   };
 
   return (

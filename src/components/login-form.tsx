@@ -13,6 +13,7 @@ import {
 import { Input } from "@/src/components/ui/input"
 import { loginAdmin } from "../functions/services/auth-service"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 export function LoginForm({
   className,
@@ -94,7 +95,15 @@ export function LoginForm({
         </Field>
 
         <Field>
-          
+          <div className="flex items-center justify-between">
+            <FieldLabel htmlFor="password">Password</FieldLabel>
+            <Link 
+              href="/auth/forgot-password" 
+              className="text-sm text-primary hover:underline"
+            >
+              Forgot password?
+            </Link>
+          </div>
           <Input
             id="password"
             type="password"

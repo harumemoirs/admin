@@ -108,17 +108,16 @@ export default function AppSidebar({
   const [userEmail, setUserEmail] = React.useState<string | null>(null);
   const [userRole, setUserRole] = React.useState<string | null>(null);
   const [userName, setUserName] = React.useState<string | null>(null);
-  
 
- const handleLogout = async () => {
-  await axios.post(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/kairos/v1/admin/auth/logout`,
-    {},
-    { withCredentials: true }
-  );
+  const handleLogout = async () => {
+    await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/kairos/v1/admin/auth/logout`,
+      {},
+      { withCredentials: true }
+    );
 
-  router.push("/auth/login");
-};
+    router.push("/auth/login");
+  };
 
   return (
     <Sidebar {...props}>
@@ -157,12 +156,17 @@ export default function AppSidebar({
                 className="text-sidebar-foreground text-sm"
               >
                 <CollapsibleTrigger asChild>
-                  <div className="flex items-center justify-between w-full px-3 py-2 rounded-md hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+                  <button
+                    type="button"
+                    className="flex items-center justify-between w-full px-3 py-2 rounded-md hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                    suppressHydrationWarning
+                  >
                     {group.baseLink ? (
                       <>
                         <Link
                           href={group.baseLink}
                           className="flex-1 text-left"
+                          onClick={(e) => e.stopPropagation()}
                         >
                           {group.title}
                         </Link>
@@ -177,7 +181,7 @@ export default function AppSidebar({
                         <ChevronRight className="ml-2 transition-transform group-data-[state=open]/collapsible:rotate-90" />
                       </>
                     )}
-                  </div>
+                  </button>
                 </CollapsibleTrigger>
               </SidebarGroupLabel>
 
@@ -222,7 +226,7 @@ export default function AppSidebar({
 
               <div className="flex flex-col">
                 <span className="text-sm font-medium text-gray-900">
-                  {loading ? "Loading..." : admin?.name }
+                  {loading ? "Loading..." : admin?.name}
                 </span>
 
                 <span className="text-xs text-gray-500">

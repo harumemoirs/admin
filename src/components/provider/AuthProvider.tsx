@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const refreshUser = async () => {
     try {
       const res = await fetch(
-        `${API_URL}/api/kairos/v1/admin/auth/me`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/kairos/v1/admin/auth/me`,
         { credentials: "include" }
       );
 
@@ -55,7 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const logout = async () => {
-    await fetch(`${API_URL}/api/kairos/v1/admin/auth/logout`, {
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/kairos/v1/admin/auth/logout`, {
       method: "POST",
       credentials: "include",
     });

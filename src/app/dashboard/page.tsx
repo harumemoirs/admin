@@ -15,8 +15,8 @@ const sections = [
     description: "Create, manage, and update blog posts for the Haru Memoirs content platform.",
     icon: <Package className="w-5 h-5 text-blue-600" />,
     quickActions: [
-      { label: "Add Blog", link: "/dashboard/blogs/add" },
-      { label: "All Blogs", link: "/dashboard/blogs/all" }
+      { label: "Add Blog", link: "/dashboard/blogs/new-blog" },
+      { label: "All Blogs", link: "/dashboard/blogs/all-blogs" }
     ]
   },
   {
@@ -24,8 +24,8 @@ const sections = [
     description: "Manage all journal entries, publish drafts, and track engagement.",
     icon: <BookText className="w-5 h-5 text-green-600" />,
     quickActions: [
-      { label: "Add Journal", link: "/dashboard/journals/add" },
-      { label: "All Journals", link: "/dashboard/journals/all" }
+      { label: "Add Journal", link: "/dashboard/journals/new-journal" },
+      { label: "All Journals", link: "/dashboard/journals/all-journals" }
     ]
   },
   {
@@ -33,8 +33,8 @@ const sections = [
     description: "Create and organize poetry content for the platform.",
     icon: <PenLine className="w-5 h-5 text-purple-600" />,
     quickActions: [
-      { label: "Add Poem", link: "/dashboard/poems/add" },
-      { label: "All Poems", link: "/dashboard/poems/all" }
+      { label: "Add Poem", link: "/dashboard/poems/new-poem" },
+      { label: "All Poems", link: "/dashboard/poems/all-poems" }
     ]
   },
   {
@@ -42,17 +42,17 @@ const sections = [
     description: "Write letters, manage submissions, and track interactions.",
     icon: <Mail className="w-5 h-5 text-red-600" />,
     quickActions: [
-      { label: "Add Letter", link: "/dashboard/letters/add" },
-      { label: "All Letters", link: "/dashboard/letters/all" }
+      { label: "Add Letter", link: "/dashboard/letters/new-letter" },
+      { label: "All Letters", link: "/dashboard/letters/all-letters" }
     ]
   },
   {
-    title: "Newsletter Analytics",
+    title: "Newsletters",
     description: "Track subscribers, send newsletters, and view engagement statistics.",
     icon: <Users className="w-5 h-5 text-orange-600" />,
     quickActions: [
       { label: "Total Subscribers", link: "/dashboard/newsletter/subscribers" },
-      { label: "Send Newsletter", link: "/dashboard/newsletter/send" },
+      { label: "Send Newsletter", link: "/dashboard/newsletter/new-broadcast" },
       // { label: "Analytics", link: "/dashboard/newsletter/analytics" }
     ]
   },

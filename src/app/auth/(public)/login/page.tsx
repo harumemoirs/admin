@@ -13,11 +13,11 @@ export default function LoginPage() {
       </div>
       <div className="bg-muted relative hidden lg:block">
         <Image
-          src="/login.jpg"
+          src="https://res.cloudinary.com/dwtbvdlzg/image/upload/v1764268053/haru-poetry-hero-section_wezfsf.jpg"
           alt="Image"
           className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-          width={400}
-          height={100}
+          width={1920}
+          height={1080}
         />
       </div>
     </div>

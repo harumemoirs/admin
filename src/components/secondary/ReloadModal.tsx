@@ -9,7 +9,7 @@ export function ReloadModal() {
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-xl shadow-xl w-72 text-center space-y-4">
         <p className="text-lg">
-          ⚠️ Reloading will make you lose progress. Continue?
+          Reloading will make you lose progress. Continue?
         </p>
         <div className="flex justify-center gap-3">
           <button

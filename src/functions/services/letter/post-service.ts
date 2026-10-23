@@ -81,7 +81,7 @@ export const editLetter = async (
       form,
       {
         withCredentials: true, // IMPORTANT
-        // ❌ NO Content-Type
+        // Note: NO Content-Type
       }
     );
 

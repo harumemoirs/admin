@@ -5,9 +5,19 @@ export function proxy(req: NextRequest) {
   const token = req.cookies.get("an_token")?.value;
   const { pathname } = req.nextUrl;
 
-  const isAuthPage = pathname.startsWith("/auth");
+  // Static files and internal Next.js assets
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/api") ||
+    pathname.includes(".")
+  ) {
+    return NextResponse.next();
+  }
 
-  if (!token && !isAuthPage) {
+  const isAuthPage = pathname.startsWith("/auth");
+  const isPublicPage = pathname === "/" || isAuthPage;
+
+  if (!token && !isPublicPage) {
     return NextResponse.redirect(new URL("/auth/login", req.url));
   }
 
@@ -19,5 +29,7 @@ export function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next|api|favicon.ico).*)"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
 };

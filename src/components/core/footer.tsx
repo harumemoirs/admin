@@ -5,7 +5,7 @@ const Footer = () => {
         <p className="text-gray-600">
           Developed by{' '}
           <a 
-            href="https://kairosagency.xyz" 
+            href="https://kairosartifex.site" 
             target="_blank" 
             rel="noopener noreferrer"
             className="text-black font-semibold hover:underline transition-colors"

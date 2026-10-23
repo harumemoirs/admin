@@ -36,7 +36,7 @@ export function LoginForm({
       const data = await loginAdmin(email, password)
       console.log("Login successful:", data)
 
-      toast.success("Logged in successfully! 🎉")
+      toast.success("Logged in successfully!")
       router.push("/")
       
     } catch (err: any) {
@@ -46,11 +46,11 @@ export function LoginForm({
       const status = err?.response?.status || err?.status
 
       if (status === 401) {
-        toast.error("Wrong credentials ❌")
+        toast.error("Wrong credentials")
         setError("Incorrect email or password.")
       } 
       else if (status === 500) {
-        toast.error("Server error. Try again later ⚠️")
+        toast.error("Server error. Try again later")
         setError("Oops! Something went wrong on our end.")
       } 
       else {

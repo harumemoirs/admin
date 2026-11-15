@@ -38,12 +38,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         if (res.ok) {
           const data = await res.json();
-          setUser(data);
+          setUser(data.admin || data);
         } else {
           setUser(null);
 
-       
-          if (pathname !== "/auth/login") {
+          if (pathname.startsWith("/dashboard")) {
             router.push("/auth/login");
           }
         }

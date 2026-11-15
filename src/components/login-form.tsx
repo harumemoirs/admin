@@ -36,8 +36,14 @@ export function LoginForm({
       const data = await loginAdmin(email, password)
       console.log("Login successful:", data)
 
+      if (data?.token && typeof window !== "undefined") {
+        const isProd = window.location.hostname.includes("harumemoirs.in");
+        const domainPart = isProd ? "; domain=.harumemoirs.in" : "";
+        document.cookie = `an_token=${data.token}; path=/${domainPart}; max-age=432000; secure; samesite=none`;
+      }
+
       toast.success("Logged in successfully!")
-      router.push("/")
+      router.push("/dashboard")
       
     } catch (err: any) {
       console.log(err)

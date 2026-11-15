@@ -79,7 +79,7 @@ export async function editBlog(
       formData.append("replaceImages", "true");
     }
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/kairos/blogs/edit-blog/${blogId}`, {
+    const response = await fetch(`${process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "https://api.harumemoirs.in"}/api/v1/admin/kairos/blogs/edit-blog/${blogId}`, {
       method: "PUT",
       body: formData,
       credentials: "include",  
@@ -174,7 +174,7 @@ export const removeBlog = async (data:RemoveBlogData) => {
 
 export async function getBlogForEdit(blogId: string) {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/kairos/blogs/blog-id/${blogId}`, {
+    const response = await fetch(`${process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "https://api.harumemoirs.in"}/api/v1/admin/kairos/blogs/blog-id/${blogId}`, {
       method: "GET",
       credentials: "include",
     });

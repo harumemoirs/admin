@@ -110,7 +110,7 @@ export default function AppSidebar({
 
   const handleLogout = async () => {
     await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/kairos/v1/admin/auth/logout`,
+      `${process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "https://api.harumemoirs.in"}/api/kairos/v1/admin/auth/logout`,
       {},
       { withCredentials: true }
     );

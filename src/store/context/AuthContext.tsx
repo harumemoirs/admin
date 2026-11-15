@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/kairos/v1/admin/auth/me`, {
+        const res = await fetch(`${process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "https://api.harumemoirs.in"}/api/kairos/v1/admin/auth/me`, {
           credentials: "include",
         });
 

@@ -76,7 +76,7 @@ export async function editPoem(
     }
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/kairos/poems/edit-poem/${poemId}`,
+      `${process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "https://api.harumemoirs.in"}/api/v1/admin/kairos/poems/edit-poem/${poemId}`,
       {
         method: "PUT",
         body: formData,
@@ -175,7 +175,7 @@ export const removePoem = async (data:RemovePoemData) => {
 
 export async function getPoemForEdit(poemId: string) {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/kairos/poems/poem-id/${poemId}`, {
+    const response = await fetch(`${process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "https://api.harumemoirs.in"}/api/v1/admin/kairos/poems/poem-id/${poemId}`, {
       method: "GET",
       credentials: "include",
     });

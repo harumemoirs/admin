@@ -178,7 +178,7 @@ export const removeLetter = async (data:RemoveLetterData) => {
 
 export async function getLetterForEdit(letterId: string) {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/kairos/letters/letter-id/${letterId}`, {
+    const response = await fetch(`${process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "https://api.harumemoirs.in"}/api/v1/admin/kairos/letters/letter-id/${letterId}`, {
       method: "GET",
       credentials: "include",
     });

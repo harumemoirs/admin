@@ -51,7 +51,7 @@ export default function ResetPasswordClient() {
 
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/kairos/v1/admin/auth/reset-password`,
+        `${process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "https://api.harumemoirs.in"}/api/kairos/v1/admin/auth/reset-password`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

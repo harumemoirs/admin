@@ -12,7 +12,7 @@ export function useAdmin() {
     const fetchMe = async () => {
       try {
         const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/kairos/v1/admin/auth/me`,
+          `${process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "https://api.harumemoirs.in"}/api/kairos/v1/admin/auth/me`,
           { withCredentials: true }
         );
 
@@ -20,7 +20,7 @@ export function useAdmin() {
       } catch (error: any) {
         if (error.response?.status === 401) {
           await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL || "https://api.harumemoirs.in"}/api/kairos/v1/admin/auth/logout`,
+            `${process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "https://api.harumemoirs.in"}/api/kairos/v1/admin/auth/logout`,
             {
               method: "POST",
               credentials: "include",

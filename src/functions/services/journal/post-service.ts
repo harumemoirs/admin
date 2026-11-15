@@ -69,7 +69,7 @@ export async function editJournal(
     }
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/kairos/journals/edit-journal/${journalId}`,
+      `${process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "https://api.harumemoirs.in"}/api/v1/admin/kairos/journals/edit-journal/${journalId}`,
       {
         method: "PUT",
         body: formData,
@@ -167,7 +167,7 @@ export const removeJournal = async (data:RemoveJournalData) => {
 };
 export async function getJournalForEdit(journalId: string) {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/kairos/journals/journal-id/${journalId}`, {
+    const response = await fetch(`${process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "https://api.harumemoirs.in"}/api/v1/admin/kairos/journals/journal-id/${journalId}`, {
       method: "GET",
       credentials: "include",
     });

@@ -48,7 +48,7 @@ export default function ForgotPasswordPage() {
 
     try {
       await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/kairos/v1/admin/auth/forgot-password`,
+        `${process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "https://api.harumemoirs.in"}/api/kairos/v1/admin/auth/forgot-password`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

@@ -20,7 +20,7 @@ export function useAdmin() {
       } catch (error: any) {
         if (error.response?.status === 401) {
           await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/auth/logout`,
+            `${process.env.NEXT_PUBLIC_API_URL || "https://api.harumemoirs.in"}/api/kairos/v1/admin/auth/logout`,
             {
               method: "POST",
               credentials: "include",
